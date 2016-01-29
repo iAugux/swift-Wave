@@ -45,12 +45,12 @@ public class Wave: UIView {
     
     public var level:CGFloat{
         set{
-            phase = phase + phaseShift; // Move the wave
-            amplitude = max( newValue,idleAmplitude);
-            updateMeters();
+            phase = phase + phaseShift // Move the wave
+            amplitude = max( newValue,idleAmplitude)
+            updateMeters()
         }
         get{
-            return 0.1;
+            return 0.1
         }
     }
     
@@ -60,7 +60,7 @@ public class Wave: UIView {
         waverHeight = CGRectGetHeight(frame)
     }
 
-    required public init(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
@@ -68,18 +68,18 @@ public class Wave: UIView {
     func setWaverLevelCallback(callBack:()->()){
         waverCallBack = callBack
         
-        for var i = 0; i < self.numOfWavers; i++ {
-            let waveline = CAShapeLayer();
-            waveline.lineCap       = kCALineCapButt;
-            waveline.lineJoin      = kCALineJoinRound;
+        for i in 0..<numOfWavers {
+            let waveline = CAShapeLayer()
+            waveline.lineCap       = kCALineCapButt
+            waveline.lineJoin      = kCALineJoinRound
             waveline.strokeColor   = UIColor.clearColor().CGColor
             waveline.fillColor     = UIColor.clearColor().CGColor
-            let lineWidth =   (i == 0) ? mainWaveWidth : decorativeWavesWidth;
+            let lineWidth =   (i == 0) ? mainWaveWidth : decorativeWavesWidth
             waveline.lineWidth = CGFloat(lineWidth)
-            let progress = 1.0 - CGFloat(i)/CGFloat(numOfWavers);
-            let multiplier = min(CGFloat(1.0), CGFloat((progress / 3.0 * 2.0) + (1.0 / 3.0)));
-            waveline.strokeColor   = UIColor(white: 1.0, alpha:( (i == 0) ? 1.0 : 1.0 * multiplier * 0.4)).CGColor;
-            self.layer.addSublayer(waveline);
+            let progress = 1.0 - CGFloat(i)/CGFloat(numOfWavers)
+            let multiplier = min(CGFloat(1.0), (progress / 3.0 * 2.0) + (1.0 / 3.0))
+            waveline.strokeColor   = UIColor(white: 1.0, alpha:( (i == 0) ? 1.0 : 1.0 * multiplier * 0.4)).CGColor
+            layer.addSublayer(waveline)
             wavers.append(waveline)
         }
 
@@ -87,25 +87,25 @@ public class Wave: UIView {
         displaylink.addToRunLoop(NSRunLoop.currentRunLoop() ,forMode:NSRunLoopCommonModes)
     }
     
-    func warverExecute(){
+    func warverExecute() {
         waverCallBack()
     }
     
     
     func updateMeters(){
-        UIGraphicsBeginImageContext(self.frame.size)
+        UIGraphicsBeginImageContext(frame.size)
         
-        for i in 0...numOfWavers - 1{
+        for i in 0..<numOfWavers {
             let wavelinePath = UIBezierPath()
-            let progress = 1.0 - CGFloat(i)/CGFloat( self.numOfWavers);
-            let normedAmplitude:CGFloat = (1.5 * progress - 0.5) * CGFloat(self.amplitude);
-            for var x:CGFloat = 0.0; x < self.waverWidth + self.density;x += self.density{
+            let progress = 1.0 - CGFloat(i)/CGFloat( numOfWavers)
+            let normedAmplitude:CGFloat = (1.5 * progress - 0.5) * CGFloat(amplitude)
+            for var x:CGFloat = 0.0; x < waverWidth + density; x += density {
                 
-                let scaling = -pow(x / self.waveMid  - 1, 2) + 1;                             // make center bigger
+                let scaling = -pow(x / waveMid  - 1, 2) + 1                             // make center bigger
                 
-                let sinValue = sin(( CGFloat(M_PI*2.0)*(x / self.waverWidth) * self.frequency + self.phase))
+                let sinValue = sin(( CGFloat(M_PI*2.0)*(x / waverWidth) * frequency + phase))
                 
-                let y = scaling * self.maxAmplitude * normedAmplitude * sinValue + self.waverHeight;
+                let y = scaling * maxAmplitude * normedAmplitude * sinValue + waverHeight
                 
                 if x == 0 {
                     wavelinePath.moveToPoint(CGPointMake(x, y))
@@ -114,8 +114,8 @@ public class Wave: UIView {
                     wavelinePath.addLineToPoint(CGPointMake(x, y))
                 }
             }
-            let waveline = self.wavers[i];
-            waveline.path = wavelinePath.CGPath;
+            let waveline = wavers[i]
+            waveline.path = wavelinePath.CGPath
         }
         
         UIGraphicsEndImageContext()
